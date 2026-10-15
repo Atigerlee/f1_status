@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>F1 2026 賽季戰績總覽｜車手積分・車隊積分・分站成績</title>
+<meta name="description" content="F1 2026 賽季戰績總覽：車手與車隊積分榜、各分站 FP1–FP3、排位賽、衝刺賽與正賽成績，附賽道圖、換胎策略與全程位置變化圖。">
+<meta name="theme-color" content="#0b0b10">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+/* ============ Design tokens ============ */
+:root {
+  --bg: #0b0b10;
+  --bg-elev: #14141c;
+  --bg-card: rgba(255,255,255,.04);
+  --bg-card-hover: rgba(255,255,255,.075);
+  --line: rgba(255,255,255,.09);
+  --text: #f2f2f6;
+  --text-dim: #9a9aae;
+  --red: #e10600;
+  --red-glow: rgba(225,6,0,.45);
+  --gold: #ffd12e;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 10px 40px rgba(0,0,0,.45);
+  --ease: cubic-bezier(.22,.8,.25,1);
+  --header-h: 68px;
+  --maxw: 1200px;
+}
+
+/* ============ Base ============ */
+*,*::before,*::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; min-height: 100vh; color: var(--text);
+  font-family: "Titillium Web", "Noto Sans TC", system-ui, -apple-system, sans-serif;
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(225,6,0,.18), transparent 60%),
+    radial-gradient(700px 500px at -10% 30%, rgba(90,60,255,.10), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+  display: flex; flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+h1,h2,h3 { margin: 0; line-height: 1.15; }
+.container { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; border-radius: 4px; }
+
+/* ============ Header / nav ============ */
+.site-header {
+  position: sticky; top: 0; z-index: 50; height: var(--header-h);
+  background: rgba(11,11,16,.72); backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid var(--line);
+}
+.site-header .container { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-mark {
+  width: 38px; height: 38px; border-radius: 9px; background: var(--red);
+  display: grid; place-items: center; font-weight: 900; font-size: 1.05rem; letter-spacing: -.5px;
+  box-shadow: 0 0 22px var(--red-glow); transform: skewX(-8deg);
+}
+.brand-mark span { transform: skewX(8deg); }
+.brand-title { font-weight: 700; font-size: 1.15rem; letter-spacing: .3px; }
+.brand-title small { display: block; font-size: .68rem; font-weight: 400; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; }
+.nav { display: flex; gap: 4px; position: relative; }
+.nav a {
+  position: relative; padding: 10px 16px; border-radius: 999px; font-weight: 600; font-size: .95rem;
+  color: var(--text-dim); transition: color .25s, background .25s;
+}
+.nav a:hover { color: var(--text); background: var(--bg-card); }
+.nav a[aria-current="page"] { color: #fff; background: var(--red); box-shadow: 0 4px 18px var(--red-glow); }
+
+/* ============ Layout ============ */
+main { flex: 1; padding: 36px 0 60px; }
+.page-head { margin-bottom: 26px; }
+.page-head h1 { font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 900; letter-spacing: -.5px; }
+.page-head h1 em { font-style: normal; color: var(--red); }
+.page-head p { margin: 8px 0 0; color: var(--text-dim); }
+.view { animation: fadeUp .45s var(--ease); }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+.card {
+  background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 20px; transition: background .25s, transform .25s var(--ease), border-color .25s;
+}
+.panel-note { color: var(--text-dim); border-style: dashed; text-align: center; padding: 48px 20px; }
+.panel-note strong { color: var(--text); display: block; font-size: 1.1rem; margin-bottom: 6px; }
+
+/* ============ Round cards ============ */
+.round-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.round-card { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 10px; min-height: 132px; }
+.round-card::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--red); opacity: .9;
+}
+.round-card.upcoming::before { background: #3a3a4a; }
+.round-card.done:hover { background: var(--bg-card-hover); transform: translateY(-4px); border-color: rgba(225,6,0,.5); }
+.round-card.upcoming { opacity: .55; cursor: not-allowed; }
+.round-no { font-size: .72rem; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; font-weight: 600; }
+.round-name { font-size: 1.2rem; font-weight: 700; }
+.round-meta { margin-top: auto; display: flex; justify-content: space-between; align-items: center; color: var(--text-dim); font-size: .85rem; gap: 8px; flex-wrap: wrap; }
+.tag { font-size: .68rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; letter-spacing: .8px; text-transform: uppercase; }
+.tag.sprint { background: rgba(255,209,46,.14); color: var(--gold); border: 1px solid rgba(255,209,46,.4); }
+.tag.done { background: rgba(60,200,120,.12); color: #5fe0a0; border: 1px solid rgba(60,200,120,.35); }
+.tag.soon { background: rgba(255,255,255,.06); color: var(--text-dim); border: 1px solid var(--line); }
+.tags { display: flex; gap: 6px; }
+
+/* ============ Tabs ============ */
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 22px 0 18px; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+.tab {
+  background: transparent; border: 1px solid var(--line); padding: 8px 16px; border-radius: 999px;
+  font-weight: 600; font-size: .9rem; color: var(--text-dim); transition: all .25s;
+}
+.tab:hover:not(:disabled) { color: var(--text); background: var(--bg-card); }
+.tab[aria-selected="true"] { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 4px 16px var(--red-glow); }
+.tab:disabled { opacity: .35; cursor: not-allowed; }
+.back-link { display: inline-flex; gap: 6px; align-items: center; color: var(--text-dim); font-weight: 600; margin-bottom: 14px; transition: color .2s; }
+.back-link:hover { color: var(--red); }
+
+/* ============ Standings (drivers / constructors) ============ */
+.toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; color: var(--text-dim); font-size: .85rem; }
+.chip { background: transparent; border: 1px solid var(--line); padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: .85rem; color: var(--text-dim); transition: all .2s; }
+.chip:hover { color: var(--text); background: var(--bg-card); }
+.chip[aria-pressed="true"] { color: #fff; background: rgba(225,6,0,.85); border-color: var(--red); }
+.chip.spacer { margin-left: auto; }
+.st-head, .st-row { display: grid; grid-template-columns: 52px minmax(0,1fr) 70px 86px 28px; align-items: center; gap: 12px; }
+.st-head { padding: 0 18px 8px; font-size: .72rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); }
+.st-head span:nth-child(3), .st-head span:nth-child(4) { text-align: right; }
+.st-list { display: grid; gap: 8px; }
+.st-item { --c: #888; position: relative; background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; transition: background .25s, border-color .25s; }
+.st-item::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--c); }
+.st-item:hover { background: var(--bg-card-hover); }
+.st-item.open { border-color: color-mix(in srgb, var(--c) 55%, transparent); background: var(--bg-card-hover); }
+.st-row { width: 100%; background: none; border: 0; padding: 14px 18px; text-align: left; }
+.st-pos { font-size: 1.5rem; font-weight: 900; font-style: italic; color: var(--text-dim); }
+.st-item.p1 .st-pos { color: #ffd12e; } .st-item.p2 .st-pos { color: #d4d8e0; } .st-item.p3 .st-pos { color: #d98c52; }
+.st-name { min-width: 0; }
+.st-name b { display: block; font-size: 1.08rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-name small { color: var(--text-dim); font-size: .82rem; }
+.st-num { display: inline-block; min-width: 26px; text-align: center; margin-right: 8px; padding: 1px 6px; border-radius: 5px; background: var(--c); color: #000; font-weight: 700; font-size: .78rem; }
+.st-wins { text-align: right; color: var(--text-dim); font-weight: 600; }
+.st-pts { text-align: right; font-size: 1.3rem; font-weight: 900; }
+.st-pts small { display: block; font-size: .68rem; font-weight: 400; color: var(--text-dim); }
+.st-caret { width: 10px; height: 10px; border-right: 2px solid var(--text-dim); border-bottom: 2px solid var(--text-dim); transform: rotate(45deg); transition: transform .3s var(--ease); justify-self: center; }
+.st-item.open .st-caret { transform: rotate(-135deg); }
+.st-bar { position: absolute; left: 4px; right: 0; bottom: 0; height: 2px; background: transparent; }
+.st-bar i { display: block; height: 100%; background: var(--c); opacity: .75; transform-origin: left; animation: grow .9s var(--ease); }
+@keyframes grow { from { transform: scaleX(0); } }
+.st-detail { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s var(--ease); }
+.st-item.open .st-detail { grid-template-rows: 1fr; }
+.st-detail > div { overflow: hidden; }
+.st-detail-inner { padding: 4px 18px 20px 22px; border-top: 1px dashed var(--line); }
+.detail-title { margin: 14px 0 8px; font-size: .78rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); }
+.chart-wrap { overflow-x: auto; }
+.chart-wrap svg { width: 100%; min-width: 520px; height: auto; display: block; }
+.chart-wrap text { fill: var(--text-dim); font-size: 10px; font-family: inherit; }
+.chart-wrap text.val { fill: var(--text); font-weight: 600; }
+.chart-wrap rect.bar { transition: opacity .2s; }
+.chart-wrap rect.bar:hover { opacity: .75; }
+.stat-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+.stat { background: rgba(0,0,0,.25); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px 14px; font-size: .8rem; color: var(--text-dim); }
+.stat b { display: block; font-size: 1.15rem; color: var(--text); }
+.contrib { display: grid; gap: 10px; margin-top: 6px; }
+.contrib-row { display: grid; grid-template-columns: minmax(110px,170px) 1fr 54px; align-items: center; gap: 12px; font-size: .92rem; }
+.contrib-bar { height: 10px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; }
+.contrib-bar i { display: block; height: 100%; border-radius: 99px; transform-origin: left; animation: grow .8s var(--ease); }
+.contrib-row b { text-align: right; }
+@media (max-width: 720px) {
+  .st-head { display: none; }
+  .st-row { grid-template-columns: 38px minmax(0,1fr) 62px 22px; gap: 8px; padding: 12px 12px; }
+  .st-wins { display: none; }
+  .st-pos { font-size: 1.2rem; }
+  .contrib-row { grid-template-columns: 90px 1fr 44px; }
+}
+
+/* ============ Session result tables ============ */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-card); }
+.tbl { width: 100%; border-collapse: collapse; font-size: .95rem; min-width: 560px; }
+.tbl th { text-align: left; padding: 12px 14px; font-size: .7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); font-weight: 600; border-bottom: 1px solid var(--line); white-space: nowrap; position: sticky; top: 0; background: #17171f; }
+.tbl td { padding: 11px 14px; border-bottom: 1px solid rgba(255,255,255,.05); white-space: nowrap; }
+.tbl tbody tr { transition: background .2s; }
+.tbl tbody tr:hover { background: var(--bg-card-hover); }
+.tbl tbody tr:last-child td { border-bottom: 0; }
+.tbl .r { text-align: right; } .tbl th.r { text-align: right; }
+.tbl td.pos { font-weight: 900; font-style: italic; width: 54px; }
+.tbl tr.podium-1 td.pos { color: #ffd12e; } .tbl tr.podium-2 td.pos { color: #d4d8e0; } .tbl tr.podium-3 td.pos { color: #d98c52; }
+.tbl td.mono { font-variant-numeric: tabular-nums; }
+.tbl td.dim { color: var(--text-dim); }
+.drv-cell { display: flex; align-items: center; gap: 10px; }
+.drv-cell i { width: 4px; height: 24px; border-radius: 2px; background: var(--c); flex: none; }
+.drv-cell b { font-weight: 600; }
+.drv-cell small { color: var(--text-dim); margin-left: 4px; }
+.team-cell { color: var(--text-dim); }
+.delta-up { color: #5fe0a0; } .delta-down { color: #ff6b6b; } .delta-eq { color: var(--text-dim); }
+.fl { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 4px; background: #a020f0; color: #fff; font-size: .65rem; font-weight: 700; vertical-align: middle; }
+.pts-cell { font-weight: 700; } .pts-cell.zero { color: var(--text-dim); font-weight: 400; }
+.status-out { color: #ff8a8a; }
+.session-note { margin: 10px 2px 0; font-size: .8rem; color: var(--text-dim); }
+.q-best { color: #5fe0a0; font-weight: 700; }
+
+/* ============ Driver photos + flags ============ */
+.avatar { --s: 44px; width: var(--s); height: var(--s); flex: none; border-radius: 50%; object-fit: cover; object-position: top center; background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--c, #888) 45%, #222), color-mix(in srgb, var(--c, #888) 18%, #111)); border: 2px solid var(--c, #888); display: inline-block; }
+.avatar.ph { display: inline-grid; place-items: center; font-size: calc(var(--s) * .3); font-weight: 700; color: #fff; }
+.st-row.av, .st-head.av { grid-template-columns: 52px 50px minmax(0,1fr) 70px 86px 28px; }
+.st-head.av span:nth-child(3) { text-align: left; }
+.st-head.av span:nth-child(4), .st-head.av span:nth-child(5) { text-align: right; }
+.det-top { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding-top: 12px; }
+.det-top .avatar { border-width: 3px; box-shadow: 0 6px 22px color-mix(in srgb, var(--c, #888) 45%, transparent); }
+.det-top .stat-chips { margin-top: 0; }
+.who { display: inline-flex; align-items: center; gap: 10px; }
+.flag { width: 28px; height: 19px; object-fit: cover; border-radius: 3px; box-shadow: 0 0 0 1px rgba(255,255,255,.18); flex: none; }
+.flag.lg { width: 44px; height: 30px; margin-right: 14px; vertical-align: middle; position: relative; top: -3px; }
+.round-top { display: flex; justify-content: space-between; align-items: center; }
+
+/* ============ Round header + track map ============ */
+.round-head { display: flex; gap: 24px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+.round-head .page-head { margin-bottom: 0; flex: 1 1 320px; }
+.track-card { flex: 0 0 auto; width: 270px; padding: 10px 12px 8px; text-align: center; }
+.track-card svg { width: 100%; height: 170px; display: block; overflow: visible; }
+.track-card small { color: var(--text-dim); font-size: .72rem; letter-spacing: 1.5px; text-transform: uppercase; }
+.track-outer { fill: none; stroke: rgba(255,255,255,.12); stroke-linejoin: round; stroke-linecap: round; }
+.track-base { fill: none; stroke: #5b5b6e; stroke-linejoin: round; stroke-linecap: round; }
+.track-glow { fill: none; stroke: var(--red); stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 90 910; filter: drop-shadow(0 0 6px var(--red)); animation: lap 5s linear infinite; }
+@keyframes lap { from { stroke-dashoffset: 1000; } to { stroke-dashoffset: 0; } }
+
+/* ============ Tyre strategy + position chart ============ */
+.sec-title { margin: 34px 0 6px; font-size: 1.25rem; font-weight: 700; }
+.sec-title small { font-weight: 400; font-size: .8rem; color: var(--text-dim); margin-left: 8px; }
+.cmp-legend { display: flex; gap: 14px; flex-wrap: wrap; margin: 8px 0 12px; font-size: .82rem; color: var(--text-dim); }
+.cmp-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -1px; margin-right: 5px; border: 2px solid var(--cc); background: var(--cc); }
+.stint-chart { border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-card); padding: 14px 14px 10px; overflow-x: auto; }
+.stint-inner { min-width: 620px; }
+.stint-axis, .stint-row { display: grid; grid-template-columns: 62px 1fr; gap: 12px; align-items: center; }
+.stint-axis { font-size: .7rem; color: var(--text-dim); padding-bottom: 6px; }
+.axis-track { position: relative; height: 14px; }
+.axis-track span { position: absolute; transform: translateX(-50%); }
+.stint-item { border-radius: var(--radius-sm); transition: background .2s; }
+.stint-item:hover, .stint-item.open { background: rgba(255,255,255,.04); }
+.stint-row { width: 100%; background: none; border: 0; padding: 4px 6px; text-align: left; }
+.stint-code { font-weight: 700; font-size: .88rem; display: flex; align-items: center; gap: 6px; }
+.stint-code i { width: 3px; height: 16px; border-radius: 2px; background: var(--c); }
+.stint-code em { font-style: normal; font-size: .68rem; color: var(--text-dim); font-weight: 400; width: 20px; }
+.stint-bars { position: relative; height: 22px; background: repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 10%); border-radius: 4px; }
+.stint-bars b { position: absolute; top: 2px; bottom: 2px; border-radius: 4px; border-right: 2px solid var(--bg); font-size: .68rem; display: flex; align-items: center; justify-content: center; white-space: nowrap; overflow: hidden; background: var(--cc); color: var(--tc); }
+.stint-detail { display: none; padding: 6px 8px 14px 74px; }
+.stint-item.open .stint-detail { display: block; animation: fadeUp .3s var(--ease); }
+.mini-tbl { border-collapse: collapse; font-size: .85rem; }
+.mini-tbl th { text-align: left; color: var(--text-dim); font-weight: 600; font-size: .68rem; letter-spacing: 1px; text-transform: uppercase; padding: 4px 18px 4px 0; }
+.mini-tbl td { padding: 4px 18px 4px 0; }
+.pos-chart { position: relative; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-card); padding: 12px; }
+.pos-chart .svg-wrap { overflow-x: auto; position: relative; }
+.pos-chart svg { width: 100%; min-width: 720px; height: auto; display: block; }
+.pos-chart text { fill: var(--text-dim); font-size: 10px; font-family: inherit; }
+.pos-chart .grid-l { stroke: rgba(255,255,255,.06); }
+.pos-chart .ln { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; transition: opacity .2s, stroke-width .2s; }
+.pos-chart .hit { fill: none; stroke: transparent; stroke-width: 9; cursor: pointer; }
+.pos-chart .pl.off { display: none; }
+.pos-chart.has-hi .pl:not(.hi) .ln { opacity: .1; }
+.pos-chart.has-hi .pl:not(.hi) text { opacity: .15; }
+.pos-chart .pl.hi .ln { stroke-width: 3.6; }
+.pos-chart .end-lbl { font-weight: 700; font-size: 10px; }
+.pos-chart .guide { stroke: rgba(255,255,255,.35); stroke-dasharray: 3 3; display: none; pointer-events: none; }
+.pos-tip { position: absolute; z-index: 5; display: none; pointer-events: none; background: rgba(15,15,22,.96); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: .72rem; box-shadow: var(--shadow); columns: 2; column-gap: 14px; }
+.pos-tip h4 { margin: 0 0 4px; font-size: .75rem; column-span: all; }
+.pos-tip div { white-space: nowrap; break-inside: avoid; }
+.pos-tip i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; background: var(--c); }
+.legend-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; align-items: center; }
+.leg-chip { background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px 3px 8px; font-size: .78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; transition: all .2s; }
+.leg-chip i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
+.leg-chip.dash i { background: transparent; border: 2px dashed var(--c); }
+.leg-chip:hover { background: var(--bg-card-hover); }
+.leg-chip.off { opacity: .35; text-decoration: line-through; }
+.pos-hint { font-size: .75rem; color: var(--text-dim); margin-top: 8px; }
+@media (max-width: 720px) { .track-card { width: 100%; } .stint-detail { padding-left: 8px; } }
+
+/* ============ Skeleton / error ============ */
+.skeleton { display: grid; gap: 12px; }
+.skel-row { height: 54px; border-radius: var(--radius-sm); background: linear-gradient(100deg, rgba(255,255,255,.04) 30%, rgba(255,255,255,.1) 50%, rgba(255,255,255,.04) 70%); background-size: 300% 100%; animation: shimmer 1.4s infinite linear; }
+@keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+.error-box { text-align: center; padding: 48px 20px; border: 1px solid rgba(225,6,0,.5); background: rgba(225,6,0,.08); border-radius: var(--radius); }
+.btn { background: var(--red); border: 0; padding: 10px 22px; border-radius: 999px; font-weight: 700; margin-top: 14px; transition: transform .2s, box-shadow .2s; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--red-glow); }
+
+/* ============ Footer ============ */
+.site-footer { border-top: 1px solid var(--line); padding: 22px 0; color: var(--text-dim); font-size: .85rem; }
+.site-footer .container { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.site-footer b { color: var(--text); font-weight: 600; }
+
+/* ============ Responsive ============ */
+@media (max-width: 720px) {
+  :root { --header-h: auto; }
+  .site-header { position: sticky; padding: 10px 0; }
+  .site-header .container { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .nav { width: 100%; overflow-x: auto; }
+  .nav a { flex: 1; text-align: center; white-space: nowrap; padding: 9px 10px; font-size: .88rem; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="#drivers" aria-label="F1 2026 首頁">
+      <div class="brand-mark"><span>F1</span></div>
+      <div class="brand-title">2026 Season<small>戰績總覽</small></div>
+    </a>
+    <nav class="nav" id="nav" aria-label="主要導覽">
+      <a id="nav-drivers" href="#drivers" data-route="drivers">車手積分</a>
+      <a id="nav-constructors" href="#constructors" data-route="constructors">車隊積分</a>
+      <a id="nav-rounds" href="#rounds" data-route="rounds">分站成績</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="container" id="app" aria-live="polite"></div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <span>資料來源：Jolpica-F1・OpenF1</span>
+    <span>資料更新時間：<b id="last-updated">—</b></span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ============ Constants ============ */
+  const DATA_BASE = 'assets/data/';
+  const SESSIONS = [
+    { key: 'fp1', label: 'FP1' },
+    { key: 'fp2', label: 'FP2' },
+    { key: 'fp3', label: 'FP3' },
+    { key: 'sprintQualifying', label: '衝刺排位' },
+    { key: 'sprint', label: '衝刺賽' },
+    { key: 'qualifying', label: '排位賽' },
+    { key: 'race', label: '正賽' },
+  ];
+
+  const $app = document.getElementById('app');
+  const $updated = document.getElementById('last-updated');
+
+  /* ============ Helpers ============ */
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const html = (strings, ...vals) => strings.reduce((a, s, i) => a + s + (i < vals.length ? vals[i] : ''), '');
+  const fmtDate = (d) => new Date(d + 'T00:00:00Z').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' });
+
+  /* ============ Data layer (static JSON, cached) ============ */
+  const cache = new Map();
+  function load(path) {
+    if (!cache.has(path)) {
+      const p = fetch(DATA_BASE + path).then((r) => {
+        if (!r.ok) throw new Error(`${r.status} ${path}`);
+        return r.json();
+      });
+      p.catch(() => cache.delete(path)); // allow retry after failure
+      cache.set(path, p);
+    }
+    return cache.get(path);
+  }
+  const store = {
+    meta: () => load('meta.json'),
+    schedule: () => load('schedule.json'),
+    drivers: () => load('drivers.json'),
+    driverStandings: () => load('driver_standings.json'),
+    constructorStandings: () => load('constructor_standings.json'),
+    round: (n) => load(`rounds/${n}.json`),
+    track: (id) => load(`tracks/${id}.json`),
+  };
+
+  /* ============ Shared UI pieces ============ */
+  /** Driver photo (circle with team colour ring); falls back to initials when no photo exists. */
+  const avatar = (info, size = 44) => {
+    const st = `--s:${size}px;--c:${info?.color || '#888'}`;
+    return info?.photo
+      ? `<img class="avatar" style="${st}" src="${esc(info.photo)}" alt="${esc(info.name || '')}" loading="lazy" onerror="this.style.visibility='hidden'">`
+      : `<span class="avatar ph" style="${st}">${esc(info?.code || '?')}</span>`;
+  };
+  const flagImg = (o, cls = 'flag') => (o?.flag ? `<img class="${cls}" src="${esc(o.flag)}" alt="${esc(o.country || '')}" loading="lazy">` : '');
+
+  const skeleton = (n = 6) => `<div class="skeleton" aria-label="載入中">${'<div class="skel-row"></div>'.repeat(n)}</div>`;
+  const pageHead = (title, sub) => html`<div class="page-head"><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ''}</div>`;
+  const comingSoon = (title, text) => html`<div class="card panel-note"><strong>${title}</strong>${text}</div>`;
+  function errorBox(err, retry) {
+    $app.innerHTML = html`<div class="error-box" role="alert"><h2>資料載入失敗</h2><p>${esc(err.message)}</p>
+      <p style="color:var(--text-dim)">若使用 file:// 直接開啟，請改用本機伺服器（例如 <code>npx serve</code>）。</p>
+      <button class="btn" id="retry-btn">重試</button></div>`;
+    document.getElementById('retry-btn').onclick = retry;
+  }
+
+  /* ============ Views ============ */
+  /* ---- standings helpers ---- */
+  const SHORT_NAME = (full) => full.replace(/ Grand Prix.*$/, '');
+
+  /** Stacked bar chart: points scored in each finished round. series = [{ color, opacity, label, values:{round:pts} }] */
+  function roundChart(rounds, series) {
+    const step = 34, padL = 8, top = 20, base = 120, W = padL * 2 + rounds.length * step, H = base + 28;
+    const totals = rounds.map((r) => series.reduce((a, s) => a + (s.values[r.round] || 0), 0));
+    const max = Math.max(10, ...totals);
+    let bars = '';
+    rounds.forEach((r, i) => {
+      const x = padL + i * step + 5;
+      let y = base;
+      series.forEach((s) => {
+        const v = s.values[r.round] || 0;
+        if (!v) return;
+        const h = (v / max) * (base - top);
+        y -= h;
+        bars += `<rect class="bar" x="${x}" y="${y.toFixed(1)}" width="${step - 10}" height="${h.toFixed(1)}" rx="3" fill="${s.color}" opacity="${s.opacity}"><title>R${r.round} ${esc(r.name)}${s.label ? ` · ${esc(s.label)}` : ''}: ${v} pts</title></rect>`;
+      });
+      if (totals[i]) bars += `<text class="val" x="${x + (step - 10) / 2}" y="${y - 5}" text-anchor="middle">${+totals[i].toFixed(1)}</text>`;
+      bars += `<text x="${x + (step - 10) / 2}" y="${base + 15}" text-anchor="middle">${r.round}</text>`;
+    });
+    return `<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="各站得分"><line x1="0" x2="${W}" y1="${base}" y2="${base}" stroke="rgba(255,255,255,.15)"/>${bars}</svg></div>`;
+  }
+
+  const statChip = (label, val) => `<div class="stat">${label}<b>${val}</b></div>`;
+  const plural = (n) => (n === 1 ? '' : 's');
+
+  const standingItem = ({ pos, color, open, avatarHtml, num, name, sub, wins, pts, gapPct, detailHtml, id }) => html`
+    <article class="st-item p${pos} ${open ? 'open' : ''}" id="${id}" style="--c:${color}">
+      <button class="st-row ${avatarHtml ? 'av' : ''}" aria-expanded="${!!open}" aria-controls="${id}-detail" data-toggle>
+        <span class="st-pos">${pos}</span>
+        ${avatarHtml || ''}
+        <span class="st-name"><b>${num != null ? `<span class="st-num">${num}</span>` : ''}${esc(name)}</b><small>${esc(sub)}</small></span>
+        <span class="st-wins">${wins} win${plural(wins)}</span>
+        <span class="st-pts">${+pts.toFixed(1)}<small>PTS</small></span>
+        <span class="st-caret" aria-hidden="true"></span>
+      </button>
+      <div class="st-bar"><i style="width:${gapPct}%"></i></div>
+      <div class="st-detail" id="${id}-detail"><div><div class="st-detail-inner">${detailHtml}</div></div></div>
+    </article>`;
+
+  const standingsHead = (cols, av) => `<div class="st-head ${av ? 'av' : ''}" aria-hidden="true"><span>Pos</span>${av ? '<span></span>' : ''}<span>${cols}</span><span>Wins</span><span>Points</span><span></span></div>`;
+
+  /* ---- drivers ---- */
+  const driverState = { sort: 'points', open: new Set() };
+  let driverCtx = null;
+
+  function renderDriverList() {
+    const { ds, drv, rounds } = driverCtx;
+    const rows = ds.standings.map((s) => ({ ...s, info: drv.drivers[s.driver] || { name: s.driver, color: '#888', team: '' } }));
+    const sorters = {
+      points: (a, b) => a.pos - b.pos,
+      wins: (a, b) => b.wins - a.wins || a.pos - b.pos,
+      name: (a, b) => a.info.name.localeCompare(b.info.name),
+    };
+    rows.sort(sorters[driverState.sort]);
+    const lead = ds.standings[0].points || 1;
+    return rows.map((s) => {
+      const best = Math.max(0, ...rounds.map((r) => s.perRound[r.round] || 0));
+      const scored = rounds.filter((r) => s.perRound[r.round]).length;
+      const detail = html`
+        <div class="det-top">${avatar(s.info, 96)}<div class="stat-chips">${statChip('Team', esc(s.info.team))}${statChip('Gap to leader', s.pos === 1 ? '—' : `-${+(lead - s.points).toFixed(1)}`)}${statChip('Best round', best || '—')}${statChip('Scoring rounds', `${scored} / ${rounds.length}`)}</div></div>
+        <div class="detail-title">Points per round</div>
+        ${roundChart(rounds, [{ color: s.info.color, opacity: 1, values: s.perRound }])}`;
+      return standingItem({
+        pos: s.pos, color: s.info.color, open: driverState.open.has(s.driver), avatarHtml: avatar(s.info, 44), num: s.info.number, name: s.info.name, sub: s.info.team,
+        wins: s.wins, pts: s.points, gapPct: (s.points / lead) * 100, detailHtml: detail, id: `driver-${s.driver}`,
+      });
+    }).join('');
+  }
+
+  async function viewDrivers() {
+    const [ds, drv, sched, meta] = await Promise.all([store.driverStandings(), store.drivers(), store.schedule(), store.meta()]);
+    const rounds = sched.filter((r) => meta.roundsAvailable.includes(r.round)).map((r) => ({ round: r.round, name: SHORT_NAME(r.name) }));
+    driverCtx = { ds, drv, rounds };
+    const sortBtn = (k, label) => `<button class="chip" id="sort-${k}" data-sort="${k}" aria-pressed="${driverState.sort === k}">${label}</button>`;
+    return html`<section class="view">
+      ${pageHead('車手<em>積分榜</em>', `截至第 ${ds.afterRound} 站・共 ${ds.standings.length} 位車手・點擊車手展開各站得分`)}
+      <div class="toolbar">排序：${sortBtn('points', '積分')}${sortBtn('wins', '勝場')}${sortBtn('name', '名稱')}
+        <button class="chip spacer" id="toggle-all" data-toggle-all>全部展開 / 收合</button></div>
+      ${standingsHead('Driver', true)}
+      <div class="st-list" id="driver-list">${renderDriverList()}</div>
+    </section>`;
+  }
+
+  /* ---- constructors ---- */
+  const teamState = { open: new Set() };
+
+  async function viewConstructors() {
+    const [cs, drv, sched, meta] = await Promise.all([store.constructorStandings(), store.drivers(), store.schedule(), store.meta()]);
+    const rounds = sched.filter((r) => meta.roundsAvailable.includes(r.round)).map((r) => ({ round: r.round, name: SHORT_NAME(r.name) }));
+    const lead = cs.standings[0].points || 1;
+    const items = cs.standings.map((s) => {
+      const color = drv.teams[s.constructorId]?.color || '#888';
+      const drivers = s.drivers;
+      const series = drivers.map((d, i) => ({
+        color, opacity: i === 0 ? 1 : i === 1 ? 0.5 : 0.3, label: drv.drivers[d.driver]?.name || d.driver, values: d.perRound,
+      }));
+      const total = drivers.reduce((a, d) => a + d.points, 0) || 1;
+      const contrib = drivers.map((d, i) => html`<div class="contrib-row"><span class="who">${avatar(drv.drivers[d.driver], 30)}${esc(drv.drivers[d.driver]?.name || d.driver)}</span>
+        <span class="contrib-bar"><i style="width:${(d.points / total) * 100}%;background:${color};opacity:${series[i].opacity}"></i></span><b>${+d.points.toFixed(1)}</b></div>`).join('');
+      const detail = html`
+        <div class="detail-title">Driver contribution</div><div class="contrib">${contrib || '<span style="color:var(--text-dim)">尚無得分</span>'}</div>
+        <div class="detail-title">Points per round (stacked by driver)</div>${roundChart(rounds, series)}`;
+      return html`${standingItem({
+        pos: s.pos, color, open: teamState.open.has(s.constructorId), name: s.name, sub: drivers.map((d) => d.driver).join(' · '),
+        wins: s.wins, pts: s.points, gapPct: (s.points / lead) * 100, detailHtml: detail, id: `team-${s.constructorId}`,
+      })}`;
+    }).join('');
+    return html`<section class="view">
+      ${pageHead('車隊<em>積分榜</em>', `截至第 ${cs.afterRound} 站・共 ${cs.standings.length} 支車隊・點擊車隊展開車手貢獻`)}
+      <div class="toolbar"><button class="chip spacer" id="toggle-all" data-toggle-all>全部展開 / 收合</button></div>
+      ${standingsHead('Constructor')}
+      <div class="st-list" id="team-list">${items}</div>
+    </section>`;
+  }
+
+  async function viewRounds() {
+    const [sched, meta] = await Promise.all([store.schedule(), store.meta()]);
+    const done = new Set(meta.roundsAvailable);
+    const cards = sched.map((r) => {
+      const ok = done.has(r.round);
+      const inner = html`
+        <div class="round-top"><div class="round-no">Round ${String(r.round).padStart(2, '0')}</div>${flagImg(r)}</div>
+        <div class="round-name">${esc(r.name)}</div>
+        <div class="round-meta"><span>${esc(r.locality)}・${fmtDate(r.date)}</span>
+          <span class="tags">${r.isSprint ? '<span class="tag sprint">Sprint</span>' : ''}<span class="tag ${ok ? 'done' : 'soon'}">${ok ? '已完賽' : '尚未舉行'}</span></span></div>`;
+      return ok
+        ? `<a class="card round-card done" id="round-card-${r.round}" href="#round/${r.round}/race">${inner}</a>`
+        : `<div class="card round-card upcoming" id="round-card-${r.round}" aria-disabled="true">${inner}</div>`;
+    }).join('');
+    return html`<section class="view">
+      ${pageHead('分站<em>成績</em>', `共 ${sched.length} 站・已完賽 ${done.size} 站`)}
+      <div class="round-grid">${cards}</div>
+    </section>`;
+  }
+
+  /* ---- round detail: session tables ---- */
+  let roundCtx = null;
+
+  const drvCell = (code, drv, nameFallback) => {
+    const d = drv.drivers[code] || {};
+    return `<div class="drv-cell" style="--c:${d.color || '#888'}"><i></i>${avatar({ ...d, code }, 30)}<b>${esc(d.name || nameFallback || code)}</b><small>${esc(code)}</small></div>`;
+  };
+  const tbl = (head, body, note) => html`<div class="tbl-wrap"><table class="tbl"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>${note ? `<p class="session-note">${note}</p>` : ''}`;
+  const podium = (p) => (p >= 1 && p <= 3 ? ` podium-${p}` : '');
+
+  function raceTable(rows, drv, isSprint) {
+    const body = rows.map((r) => {
+      const delta = r.grid ? r.grid - r.pos : null;
+      const dCell = delta === null ? '<span class="delta-eq">PIT</span>' : delta > 0 ? `<span class="delta-up">\u25b2${delta}</span>` : delta < 0 ? `<span class="delta-down">\u25bc${-delta}</span>` : '<span class="delta-eq">\u2013</span>';
+      const finished = r.status === 'Finished' || /^\+\d+ Lap/.test(r.status);
+      const timeCell = r.time ? esc(r.time) : `<span class="${finished ? '' : 'status-out'}">${esc(r.status)}</span>`;
+      const fl = r.fastestLap?.rank === 1 ? '<span class="fl" title="Fastest lap">FL</span>' : '';
+      return html`<tr class="${podium(r.pos)}"><td class="pos">${esc(r.posText || r.pos)}</td><td>${drvCell(r.driver, drv, r.name)}</td>
+        <td class="team-cell">${esc(r.team)}</td><td class="r mono dim">${r.grid || 'PL'}</td><td class="r">${dCell}</td>
+        <td class="r mono dim">${r.laps}</td><td class="r mono">${timeCell}${fl}</td><td class="r pts-cell ${r.points ? '' : 'zero'}">${r.points || '\u2013'}</td></tr>`;
+    }).join('');
+    return tbl('<th>Pos</th><th>Driver</th><th>Team</th><th class="r">Grid</th><th class="r">+/\u2212</th><th class="r">Laps</th><th class="r">Time / Status</th><th class="r">Pts</th>', body,
+      `PL = \u5f9e\u7dad\u4fee\u5340\u51fa\u767c\u3002${isSprint ? '\u885d\u523a\u8cfd' : '\u6b63\u8cfd'}\u7d50\u679c\u4f86\u81ea Jolpica-F1\u3002`);
+  }
+
+  function qualiTable(rows, drv) {
+    // best (fastest) time per column to highlight
+    const toSec = (t) => { if (!t) return Infinity; const [m, s] = t.includes(':') ? t.split(':') : [0, t]; return +m * 60 + +s; };
+    const best = ['q1', 'q2', 'q3'].map((k) => Math.min(...rows.map((r) => toSec(r[k]))));
+    const cell = (r, k, i) => (r[k] ? `<td class="r mono ${toSec(r[k]) === best[i] ? 'q-best' : ''}">${esc(r[k])}</td>` : '<td class="r dim">\u2013</td>');
+    const body = rows.map((r) => html`<tr class="${podium(r.pos)}"><td class="pos">${r.pos}</td><td>${drvCell(r.driver, drv, r.name)}</td>
+      <td class="team-cell">${esc(r.team)}</td>${cell(r, 'q1', 0)}${cell(r, 'q2', 1)}${cell(r, 'q3', 2)}</tr>`).join('');
+    return tbl('<th>Pos</th><th>Driver</th><th>Team</th><th class="r">Q1</th><th class="r">Q2</th><th class="r">Q3</th>', body, '\u7da0\u8272 = \u8a72\u6bb5\u6700\u5feb\u5708\u901f\u3002');
+  }
+
+  function practiceTable(rows, drv) {
+    const body = rows.map((r) => html`<tr class="${podium(r.pos)}"><td class="pos">${r.pos ?? '\u2013'}</td><td>${drvCell(r.driver, drv)}</td>
+      <td class="team-cell">${esc(r.team)}</td><td class="r mono">${r.time ? esc(r.time) : '<span class="dim">\u2013</span>'}</td>
+      <td class="r mono dim">${esc(r.gap || '')}</td><td class="r mono dim">${r.laps ?? '\u2013'}</td></tr>`).join('');
+    return tbl('<th>Pos</th><th>Driver</th><th>Team</th><th class="r">Best lap</th><th class="r">Gap</th><th class="r">Laps</th>', body, '\u7df4\u7fd2\u8cfd\u7d50\u679c\u4f86\u81ea OpenF1\u3002');
+  }
+
+  /* ---- track map / tyre strategy / lap position chart ---- */
+  const COMPOUND = {
+    SOFT: ['#e8002d', '#fff', 'S'], MEDIUM: ['#ffd12e', '#000', 'M'], HARD: ['#f0f0f0', '#000', 'H'],
+    INTERMEDIATE: ['#43b02a', '#000', 'I'], WET: ['#0067ad', '#fff', 'W'], UNKNOWN: ['#555', '#fff', '?'],
+  };
+  const cmpOf = (c) => COMPOUND[(c || 'UNKNOWN').toUpperCase()] || COMPOUND.UNKNOWN;
+  const cap = (s) => s.charAt(0) + s.slice(1).toLowerCase();
+  const isFinished = (st) => st === 'Finished' || /^\+\d+ Lap/.test(st || '');
+
+  function roundHead(round, track, sub) {
+    return html`<div class="round-head"><div class="page-head"><h1>${flagImg(round, 'flag lg')}${esc(round.name)}</h1><p>${sub}</p></div>${trackCard(track, round)}</div>`;
+  }
+
+  function trackCard(t, round) {
+    if (!t || !t.points?.length) return '';
+    const [x0, y0, x1, y1] = t.bbox;
+    const w = x1 - x0, h = y1 - y0, u = Math.max(w, h) / 100, pad = 9 * u;
+    const P = t.points.map(([x, y]) => [x - x0, y1 - y]); // OpenF1 y axis points up -> flip for SVG
+    const d = 'M' + P.map((p) => `${p[0].toFixed(0)},${p[1].toFixed(0)}`).join('L') + 'Z';
+    const a = P[0], b = P[Math.min(4, P.length - 1)], ang = (Math.atan2(b[1] - a[1], b[0] - a[0]) * 180) / Math.PI;
+    const q = P[Math.min(Math.round(P.length / 2), P.length - 1)], q2 = P[Math.min(Math.round(P.length / 2) + 3, P.length - 1)];
+    const ang2 = (Math.atan2(q2[1] - q[1], q2[0] - q[0]) * 180) / Math.PI;
+    return html`<aside class="card track-card" aria-label="Circuit map">
+      <svg viewBox="${-pad} ${-pad} ${w + 2 * pad} ${h + 2 * pad}" role="img" aria-label="${esc(round.circuit)} circuit layout" id="track-svg">
+        <path class="track-outer" d="${d}" stroke-width="${4.2 * u}"/>
+        <path class="track-base" d="${d}" stroke-width="${1.7 * u}"/>
+        <path class="track-glow" d="${d}" pathLength="1000" stroke-width="${1.9 * u}"/>
+        <g transform="translate(${a[0]},${a[1]}) rotate(${ang})"><line y1="${-3.4 * u}" y2="${3.4 * u}" stroke="#fff" stroke-width="${1.2 * u}"/></g>
+        <g transform="translate(${q[0]},${q[1]}) rotate(${ang2})"><polygon points="${3 * u},0 ${-2 * u},${-2.3 * u} ${-2 * u},${2.3 * u}" fill="#fff" opacity=".85"/></g>
+      </svg>
+      <small>${esc(round.circuit)}</small></aside>`;
+  }
+
+  const cmpLegend = () => `<div class="cmp-legend">${['SOFT', 'MEDIUM', 'HARD', 'INTERMEDIATE', 'WET', 'UNKNOWN'].map((c) => `<span><span class="cmp-dot" style="--cc:${COMPOUND[c][0]}"></span>${c === 'UNKNOWN' ? 'No data' : cap(c)}</span>`).join('')}</div>`;
+
+  function stintChart(key, round, drv) {
+    const stints = key === 'sprint' ? round.sprintStints : round.stints;
+    const rows = round.sessions[key];
+    if (!stints || !Object.keys(stints).length) return '';
+    const total = Math.max(...rows.map((r) => r.laps || 0)) || 1;
+    const step = total > 45 ? 10 : 5;
+    const ticks = [];
+    for (let l = step; l <= total; l += step) ticks.push(`<span style="left:${((l - 0.5) / total) * 100}%">${l}</span>`);
+    const pits = key === 'race' ? round.pitstops || {} : {};
+    const items = rows.map((r) => {
+      const list = stints[r.driver] || [];
+      const d = drv.drivers[r.driver] || {};
+      const lastLap = r.laps || total;
+      const bars = list.map((s) => {
+        const end = Math.min(s.end || lastLap, lastLap), start = Math.min(s.start || 1, end);
+        const [bg, fg, ch] = cmpOf(s.compound);
+        return `<b style="left:${((start - 1) / total) * 100}%;width:${((end - start + 1) / total) * 100}%;--cc:${bg};--tc:${fg}" title="${cap(s.compound)} \u00b7 L${start}\u2013${end}">${end - start + 1 >= 4 ? `${ch} ${end - start + 1}` : ch}</b>`;
+      }).join('');
+      const detailRows = list.map((s) => {
+        const end = Math.min(s.end || lastLap, lastLap), start = Math.min(s.start || 1, end);
+        const stop = (pits[r.driver] || []).find((p) => p.lap === end);
+        return `<tr><td>${s.stint}</td><td><span class="cmp-dot" style="--cc:${cmpOf(s.compound)[0]}"></span>${cap(s.compound || 'UNKNOWN')}</td><td>L${start}\u2013${end} (${end - start + 1})</td><td>${s.age ? `Used (${s.age} laps)` : 'New'}</td><td>${stop ? `Pit L${stop.lap} \u00b7 ${esc(stop.duration)}s` : end < lastLap ? 'Pit' : 'Finish'}</td></tr>`;
+      }).join('');
+      const id = `stint-${key}-${r.driver}`;
+      return `<div class="stint-item" id="${id}" style="--c:${d.color || '#888'}">
+        <button class="stint-row" data-stint-toggle aria-expanded="false" aria-label="${esc(d.name || r.driver)} tyre stints"><span class="stint-code"><em>${r.posText || r.pos}</em><i></i>${esc(r.driver)}</span><span class="stint-bars">${bars || '<span style="font-size:.7rem;color:var(--text-dim);padding-left:8px">No tyre data</span>'}</span></button>
+        <div class="stint-detail"><table class="mini-tbl"><thead><tr><th>Stint</th><th>Tyre</th><th>Laps</th><th>Age</th><th>Stop</th></tr></thead><tbody>${detailRows || '<tr><td colspan="5">No data</td></tr>'}</tbody></table></div></div>`;
+    }).join('');
+    return html`<h2 class="sec-title">Tyre strategy<small>\u63db\u80ce\u7b56\u7565\u30fb\u9ede\u64ca\u8eca\u624b\u67e5\u770b\u6bcf\u6bb5\u7d30\u7bc0</small></h2>${cmpLegend()}
+      <div class="stint-chart"><div class="stint-inner"><div class="stint-axis"><span>Lap</span><div class="axis-track">${ticks.join('')}</div></div>${items}</div></div>`;
+  }
+
+  function positionChart(key, round, drv) {
+    const lp = key === 'sprint' ? round.sprintLapPositions : round.lapPositions;
+    const rows = round.sessions[key];
+    if (!lp || !Object.keys(lp).length) return '';
+    const N = Math.max(...rows.map((r) => r.laps || 0), 1);
+    const maxPos = Math.max(...Object.values(lp).flatMap((a) => Array.from(a).filter((v) => v != null)), rows.length);
+    const order = [...rows.map((r) => r.driver), ...Object.keys(lp).filter((c) => !rows.some((r) => r.driver === c))].filter((c) => lp[c]);
+    const info = Object.fromEntries(rows.map((r) => [r.driver, r]));
+    const seen = {};
+    const W = 1000, ml = 40, mr = 48, mt = 14, mb = 30, rowH = 24, H = mt + mb + (maxPos - 1) * rowH;
+    const X = (l) => ml + (l / N) * (W - ml - mr), Y = (p) => mt + (p - 1) * rowH;
+    let grid = '';
+    for (let p = 1; p <= maxPos; p++) grid += `<line class="grid-l" x1="${ml}" x2="${W - mr}" y1="${Y(p)}" y2="${Y(p)}"/><text x="${ml - 8}" y="${Y(p) + 3}" text-anchor="end">P${p}</text>`;
+    const step = N > 40 ? 10 : 5;
+    let xl = `<text x="${X(0)}" y="${H - 10}" text-anchor="middle">Grid</text>`;
+    for (let l = step; l <= N; l += step) xl += `<line class="grid-l" x1="${X(l)}" x2="${X(l)}" y1="${mt}" y2="${H - mb + 4}"/><text x="${X(l)}" y="${H - 10}" text-anchor="middle">${l}</text>`;
+    const dashed = {};
+    const lines = order.map((code) => {
+      const d = drv.drivers[code] || {}, r = info[code];
+      const team = r?.constructorId || d.constructorId || code;
+      seen[team] = (seen[team] || 0) + 1;
+      const dash = seen[team] === 2;
+      dashed[code] = dash;
+      const arr = Array.from(lp[code]);
+      let path = '', pen = false, last = -1;
+      arr.forEach((p, l) => {
+        if (p == null) { pen = false; return; }
+        path += `${pen ? 'L' : 'M'}${X(l).toFixed(1)},${Y(p).toFixed(1)}`;
+        pen = true; last = l;
+      });
+      if (last < 0) return '';
+      const color = d.color || '#888';
+      const retired = r && !isFinished(r.status) && last < N;
+      const ex = X(last), ey = Y(arr[last]);
+      const mark = retired ? `<text x="${ex}" y="${ey + 4}" text-anchor="middle" style="fill:${color};font-size:13px;font-weight:700">\u2715</text>` : `<circle cx="${ex}" cy="${ey}" r="3" fill="${color}"/>`;
+      return `<g class="pl" data-code="${esc(code)}"><title>${esc(d.name || code)}</title><path class="hit" d="${path}"/><path class="ln" d="${path}" stroke="${color}" ${dash ? 'stroke-dasharray="6 4"' : ''}/>${mark}<text class="end-lbl" x="${ex + (retired ? 9 : 7)}" y="${ey + 3}" style="fill:${color}">${esc(code)}</text></g>`;
+    }).join('');
+    const chips = order.map((code) => {
+      const d = drv.drivers[code] || {};
+      return `<button class="leg-chip ${dashed[code] ? 'dash' : ''}" style="--c:${d.color || '#888'}" data-code="${esc(code)}" data-chip aria-pressed="true" title="${esc(d.name || code)}"><i></i>${esc(code)}</button>`;
+    }).join('');
+    return html`<h2 class="sec-title">Race position by lap<small>\u5168\u7a0b\u4f4d\u7f6e\u8b8a\u5316\u30fbP1 \u5728\u6700\u4e0a\u65b9</small></h2>
+      <div class="pos-chart" id="pos-${key}" data-key="${key}" data-n="${N}" data-w="${W}" data-ml="${ml}" data-mr="${mr}">
+        <div class="svg-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Lap by lap position chart">${grid}${xl}${lines}<line class="guide" y1="${mt - 4}" y2="${H - mb + 4}"/></svg>
+        <div class="pos-tip"></div></div>
+        <div class="legend-bar">${chips}<button class="leg-chip" data-chart-all="show" style="--c:#888">Show all</button><button class="leg-chip" data-chart-all="hide" style="--c:#888">Hide all</button></div>
+        <p class="pos-hint">\u6ed1\u9f20\u79fb\u5230\u5716\u4e0a\u67e5\u770b\u8a72\u5708\u540d\u6b21\uff1b\u9ede\u64ca\u7dda\u689d\u6216\u5716\u4f8b\u5207\u63db\u9ad8\u4eae\u3001\u5207\u63db\u986f\u793a\u3002\u865b\u7dda = \u540c\u968a\u7b2c\u4e8c\u4f4d\u8eca\u624b\uff0c\u2715 = \u9000\u8cfd\u3002</p>
+      </div>`;
+  }
+
+  /* chart interaction state, kept per chart id */
+  const chartState = {};
+  const getCS = (el) => (chartState[el.id] ||= { hidden: new Set(), pinned: null, hover: null });
+  function applyChart(el) {
+    const s = getCS(el), hi = s.hover || s.pinned;
+    el.classList.toggle('has-hi', !!hi);
+    el.querySelectorAll('.pl').forEach((g) => {
+      g.classList.toggle('off', s.hidden.has(g.dataset.code));
+      g.classList.toggle('hi', g.dataset.code === hi);
+    });
+    el.querySelectorAll('[data-chip]').forEach((c) => {
+      const off = s.hidden.has(c.dataset.code);
+      c.classList.toggle('off', off);
+      c.setAttribute('aria-pressed', !off);
+    });
+  }
+
+  function renderSession(key) {
+    const { round, drv } = roundCtx;
+    const rows = round.sessions[key] || [];
+    if (!rows.length) return comingSoon('\u5c1a\u7121\u8cc7\u6599', '\u9019\u500b session \u76ee\u524d\u6c92\u6709\u6210\u7e3e\u8cc7\u6599\u3002');
+    if (key === 'race' || key === 'sprint') return raceTable(rows, drv, key === 'sprint') + stintChart(key, round, drv) + positionChart(key, round, drv);
+    if (key === 'qualifying' || key === 'sprintQualifying') return qualiTable(rows, drv);
+    return practiceTable(rows, drv);
+  }
+
+  async function viewRound(n, sessionKey) {
+    const [sched, meta, drv] = await Promise.all([store.schedule(), store.meta(), store.drivers()]);
+    const info = sched.find((r) => r.round === n);
+    if (!info || !meta.roundsAvailable.includes(n)) return notFound('\u6b64\u5206\u7ad9\u5c1a\u7121\u8cc7\u6599');
+    const round = { ...(await store.round(n)), flag: info.flag };
+    const track = await store.track(round.circuitId).catch(() => null);
+    roundCtx = { round, drv };
+    const available = SESSIONS.filter((s) => (s.key.startsWith('sprint') ? round.isSprint : true));
+    const hasData = (k) => (round.sessions[k] || []).length > 0;
+    const wanted = available.find((s) => s.key === sessionKey && hasData(s.key));
+    const current = wanted ? wanted.key : hasData('race') ? 'race' : (available.find((s) => hasData(s.key)) || available[0]).key;
+    const tabs = available.map((s) => `<button class="tab" role="tab" id="tab-${s.key}" aria-selected="${s.key === current}" data-session="${s.key}" ${hasData(s.key) ? '' : 'disabled'}>${s.label}</button>`).join('');
+    return html`<section class="view">
+      <a class="back-link" href="#rounds">\u2190 \u8fd4\u56de\u5206\u7ad9\u5217\u8868</a>
+      ${roundHead(round, track, `Round ${round.round}\u30fb${esc(round.circuit)}\u30fb${fmtDate(round.date)}${round.isSprint ? '\u30fbSprint Weekend' : ''}`)}
+      <div class="tabs" role="tablist" aria-label="Session">${tabs}</div>
+      <div id="session-panel" role="tabpanel">${renderSession(current)}</div>
+    </section>`;
+  }
+
+  const notFound = (msg = '找不到頁面') => html`<section class="view">${pageHead('404')}${comingSoon(msg, '<a class="back-link" href="#drivers" style="margin:8px 0 0">回首頁</a>')}</section>`;
+
+  /* ============ Router ============ */
+  const routes = [
+    { re: /^#?\/?$|^#drivers$/, nav: 'drivers', title: '車手積分', view: viewDrivers },
+    { re: /^#constructors$/, nav: 'constructors', title: '車隊積分', view: viewConstructors },
+    { re: /^#rounds$/, nav: 'rounds', title: '分站成績', view: viewRounds },
+    { re: /^#round\/(\d+)(?:\/(\w+))?$/, nav: 'rounds', title: '分站詳情', view: (m) => viewRound(Number(m[1]), m[2]) },
+  ];
+
+  let renderToken = 0;
+  async function render() {
+    const hash = location.hash || '#drivers';
+    const token = ++renderToken;
+    let match = null, route = null;
+    for (const r of routes) { const m = hash.match(r.re); if (m) { route = r; match = m; break; } }
+
+    document.querySelectorAll('.nav a').forEach((a) => {
+      if (route && a.dataset.route === route.nav) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+    document.title = `${route ? route.title : '404'}｜F1 2026 賽季戰績總覽`;
+    $app.innerHTML = skeleton();
+    try {
+      const out = route ? await route.view(match) : notFound();
+      if (token !== renderToken) return; // a newer navigation superseded this one
+      $app.innerHTML = out;
+      bindView();
+      window.scrollTo({ top: 0 });
+    } catch (err) {
+      if (token === renderToken) errorBox(err, render);
+    }
+  }
+
+  /** Wire up interactions of the freshly rendered view. */
+  function bindView() {
+    // Session tabs switch in place (no skeleton flash); the URL is kept in sync for deep links.
+    document.querySelectorAll('.tab[data-session]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (!roundCtx) return;
+        document.querySelectorAll('.tab[data-session]').forEach((b) => b.setAttribute('aria-selected', b === btn));
+        document.getElementById('session-panel').innerHTML = renderSession(btn.dataset.session);
+        history.replaceState(null, '', `#round/${roundCtx.round.round}/${btn.dataset.session}`);
+      });
+    });
+  }
+
+  /* Delegated handlers for expandable standings rows, sorting and expand/collapse all. */
+  $app.addEventListener('click', (e) => {
+    const toggle = e.target.closest('[data-toggle]');
+    if (toggle) {
+      const item = toggle.closest('.st-item');
+      const open = item.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open);
+      const isDriver = item.id.startsWith('driver-');
+      const key = item.id.replace(/^(driver|team)-/, '');
+      (isDriver ? driverState.open : teamState.open)[open ? 'add' : 'delete'](key);
+      return;
+    }
+    const sort = e.target.closest('[data-sort]');
+    if (sort && driverCtx) {
+      driverState.sort = sort.dataset.sort;
+      document.querySelectorAll('[data-sort]').forEach((b) => b.setAttribute('aria-pressed', b === sort));
+      document.getElementById('driver-list').innerHTML = renderDriverList();
+      return;
+    }
+    if (e.target.closest('[data-toggle-all]')) {
+      const items = [...document.querySelectorAll('.st-item')];
+      const openAll = items.some((i) => !i.classList.contains('open'));
+      items.forEach((i) => {
+        i.classList.toggle('open', openAll);
+        i.querySelector('[data-toggle]').setAttribute('aria-expanded', openAll);
+        const key = i.id.replace(/^(driver|team)-/, '');
+        (i.id.startsWith('driver-') ? driverState.open : teamState.open)[openAll ? 'add' : 'delete'](key);
+      });
+    }
+  });
+
+  /* Round detail interactions: tyre rows, lap-position chart (hover guide, legend, pin, hide). */
+  $app.addEventListener('click', (e) => {
+    const st = e.target.closest('[data-stint-toggle]');
+    if (st) {
+      const item = st.closest('.stint-item');
+      st.setAttribute('aria-expanded', item.classList.toggle('open'));
+      return;
+    }
+    const chart = e.target.closest('.pos-chart');
+    if (!chart) return;
+    const s = getCS(chart);
+    const all = e.target.closest('[data-chart-all]');
+    if (all) {
+      s.hidden = new Set(all.dataset.chartAll === 'hide' ? [...chart.querySelectorAll('.pl')].map((g) => g.dataset.code) : []);
+      s.pinned = null;
+    } else if (e.target.closest('[data-chip]')) {
+      const c = e.target.closest('[data-chip]').dataset.code;
+      s.hidden.has(c) ? s.hidden.delete(c) : s.hidden.add(c);
+    } else if (e.target.closest('.pl')) {
+      const c = e.target.closest('.pl').dataset.code;
+      s.pinned = s.pinned === c ? null : c;
+    } else return;
+    applyChart(chart);
+  });
+
+  $app.addEventListener('mouseover', (e) => {
+    const chart = e.target.closest('.pos-chart');
+    if (!chart) return;
+    const s = getCS(chart);
+    const code = e.target.closest('[data-code]')?.dataset.code || null;
+    if (s.hover !== code) { s.hover = code; applyChart(chart); }
+  });
+  $app.addEventListener('mouseout', (e) => {
+    const chart = e.target.closest('.pos-chart');
+    if (!chart || chart.contains(e.relatedTarget)) return;
+    getCS(chart).hover = null;
+    applyChart(chart);
+    chart.querySelector('.guide').style.display = 'none';
+    chart.querySelector('.pos-tip').style.display = 'none';
+  });
+  $app.addEventListener('mousemove', (e) => {
+    const svg = e.target.closest('.pos-chart svg');
+    if (!svg || !roundCtx) return;
+    const chart = svg.closest('.pos-chart'), { round, drv } = roundCtx;
+    const key = chart.dataset.key, N = +chart.dataset.n, W = +chart.dataset.w, ml = +chart.dataset.ml, mr = +chart.dataset.mr;
+    const rect = svg.getBoundingClientRect();
+    const vx = ((e.clientX - rect.left) / rect.width) * W;
+    const lap = Math.max(0, Math.min(N, Math.round(((vx - ml) / (W - ml - mr)) * N)));
+    const gx = ml + (lap / N) * (W - ml - mr);
+    const guide = chart.querySelector('.guide');
+    guide.setAttribute('x1', gx); guide.setAttribute('x2', gx); guide.style.display = 'block';
+    const lp = key === 'sprint' ? round.sprintLapPositions : round.lapPositions, hidden = getCS(chart).hidden;
+    const at = Object.entries(lp).filter(([c, a]) => a[lap] != null && !hidden.has(c)).sort((a, b) => a[1][lap] - b[1][lap]);
+    const tip = chart.querySelector('.pos-tip');
+    tip.innerHTML = `<h4>${lap === 0 ? 'Grid' : `Lap ${lap}`}</h4>` + at.map(([c, a]) => `<div style="--c:${drv.drivers[c]?.color || '#888'}"><i></i>P${a[lap]} ${esc(c)}</div>`).join('');
+    tip.style.display = 'block';
+    const wrap = tip.parentElement.getBoundingClientRect();
+    const px = e.clientX - wrap.left, flip = px + tip.offsetWidth + 24 > wrap.width;
+    tip.style.left = `${flip ? px - tip.offsetWidth - 14 : px + 14}px`;
+    tip.style.top = `${Math.max(0, Math.min(e.clientY - wrap.top - 10, wrap.height - tip.offsetHeight))}px`;
+  });
+
+  window.addEventListener('hashchange', render);
+  store.meta().then((m) => {
+    $updated.textContent = new Date(m.lastUpdated).toLocaleString('zh-TW', { hour12: false });
+  }).catch(() => {});
+  render();
+})();
+</script>
+</body>
+</html>
